@@ -354,52 +354,57 @@ class Ribbons {
         }
     }
     
-    private function save_ribbons(){
+    private function saveRibbons(){
         $id = static::$user_id;
-        if(
+        if (
             $id === null
             OR ! isset($_SESSION['ribbons'])
-        ){ return false; }
+        ) {
+            return false;
+        }
         static::initDatabase();
         $data = '';
         $i = count($_SESSION['ribbons']);
-        foreach( $_SESSION['ribbons'] as $key => $val ){
-            $data .= $key.'='.$val;
-            if( --$i ){ $data .= '|'; }
+        foreach ($_SESSION['ribbons'] as $key => $val ){
+            $data .= $key . '=' . $val;
+            if (--$i) {
+                $data .= '|';
+            }
         }
         
-        if(
-            $stmt = static::$dbcnnx->prepare("
-SELECT data FROM ".static::$ribbons_table."
-WHERE id=:id
-LIMIT 1
-")
+        if (
+            $stmt = static::$dbcnnx->prepare(
+                "SELECT data FROM " . static::$ribbons_table . 
+                "WHERE id=:id " .
+                "LIMIT 1"
+            )
             AND $stmt->bindValue(':id', $id, PDO::PARAM_INT)
             AND $stmt->execute()
             AND $result = $stmt->fetch(PDO::FETCH_ASSOC)
-            AND $stmt = static::$dbcnnx->prepare("
-UPDATE ".static::$ribbons_table." SET data=:data
-WHERE id=:id
-")
+            AND $stmt = static::$dbcnnx->prepare(
+                "UPDATE " . static::$ribbons_table . " SET " .
+                "data=:data " .
+                "WHERE id=:id"
+            )
             AND $stmt->bindValue(':data', $data, PDO::PARAM_STR)
             AND $stmt->bindValue(':id', $id, PDO::PARAM_INT)
             AND $stmt->execute()
             AND $result = $stmt->rowCount()
-        ){
+        ) {
             $success = true;
-        }elseif(
-            $stmt = static::$dbcnnx->prepare("
-INSERT INTO ".static::$ribbons_table." (id,data)
-VALUES (:id,:data)
-")
+        } elseif (
+            $stmt = static::$dbcnnx->prepare(
+                "INSERT INTO " . static::$ribbons_table . " (id,data) ".
+                "VALUES (:id,:data)"
+            )
             AND $stmt->bindValue(':id', $id, PDO::PARAM_INT)
             AND $stmt->bindValue(':data', $data, PDO::PARAM_STR)
             AND $stmt->execute()
             AND $result = $stmt->rowCount()
-        ){
+        ) {
             $success = true;
-        }else{
-            die('FATAL ERROR: Can\'t save data.<pre>'.print_r($result,true));
+        } else {
+            die('FATAL ERROR: Can\'t save data.<pre>' . print_r($result,true));
         }
     }
     
