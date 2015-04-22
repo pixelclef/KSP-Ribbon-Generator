@@ -209,8 +209,8 @@ class Ribbons {
         }
     }
     
-    private function my_urlencode($inout){
-        return preg_replace('/\s/','%20',$inout);
+    private function myUrlEncode($url) {
+        return preg_replace('/\s/', '%20', $url);
     }
     
     private function de_space($in_out){
@@ -743,7 +743,7 @@ VALUES (:id,:data)
             }else{ $height = ''; }
             if( $planet !== 'Asteroid' ){
                 $image = '
-            <img class="ribbon_image" alt="'.$planet.'" src="'.$this->my_urlencode($image).'"/>';
+            <img class="ribbon_image" alt="'.$planet.'" src="'.$this->myUrlEncode($image).'"/>';
             }else{ $image = ''; }
             if(
                 ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] )
@@ -775,7 +775,7 @@ VALUES (:id,:data)
                     }else{ $selected = ''; }
                     $image = static::$images_root.'/Asteroid - '.$planet2.'.png';
                     $image = '
-            <img class="device '.$this->de_space($planet2).$selected.'" alt="Image:'.$device.'" src="'.$this->my_urlencode($image).'"/>';
+            <img class="device '.$this->de_space($planet2).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
                     $return .= $image;
                 }
             }
@@ -794,7 +794,7 @@ VALUES (:id,:data)
                 if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
                 $image .= '/'.$effect.'.png';
                 $image = '
-        <img class="effect '.$name.$selected.'" alt="Image:'.$effect.'" src="'.$this->my_urlencode($image).'"/>';
+        <img class="effect '.$name.$selected.'" alt="Image:'.$effect.'" src="'.$this->myUrlEncode($image).'"/>';
                 $return .= $image;
             }
             
@@ -836,7 +836,7 @@ VALUES (:id,:data)
                 if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
                 $image .= '/'.$device.'.png';
                 $image = '
-            <img class="device '.$this->de_space($device).$selected.'" alt="Image:'.$device.'" src="'.$this->my_urlencode($image).'"/>';
+            <img class="device '.$this->de_space($device).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
                 $return .= $image;
             }
             
@@ -855,7 +855,7 @@ VALUES (:id,:data)
                     }else{ $selected = ''; }
                     $image = static::$images_root.'/shield/'.$planet2.' Visit.png';
                     $image = '
-            <img class="device '.$this->de_space($planet2).$selected.'" alt="Image:'.$planet2.'" src="'.$this->my_urlencode($image).'"/>';
+            <img class="device '.$this->de_space($planet2).$selected.'" alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
                     $return .= $image;
                 }
                 
@@ -906,7 +906,7 @@ VALUES (:id,:data)
                             }else{ $selected = ''; }
                             $image = static::$images_root.'/shield/'.$OLname.'.png';
                             $image = '
-            <img class="device '.$this->de_space($OLname).$selected.'" alt="Image:'.$OLname.'" src="'.$this->my_urlencode($image).'"/>';
+            <img class="device '.$this->de_space($OLname).$selected.'" alt="Image:'.$OLname.'" src="'.$this->myUrlEncode($image).'"/>';
                             $return .= $image;
                         }
                     }
@@ -928,7 +928,7 @@ VALUES (:id,:data)
                 if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
                 $image .= '/'.$effect.'.png';
                 $image = '
-        <img class="effect '.$name.$selected.'" alt="Image:'.$effect.'" src="'.$this->my_urlencode($image).'"/>';
+        <img class="effect '.$name.$selected.'" alt="Image:'.$effect.'" src="'.$this->myUrlEncode($image).'"/>';
                 $return .= $image;
             }
             
@@ -1014,7 +1014,7 @@ VALUES (:id,:data)
                 
                 $image = static::$images_root.'/'.$effect.'.png';
                 $image = '
-                    <img alt="Image:'.$effect.'" src="'.$this->my_urlencode($image).'"/>';
+                    <img alt="Image:'.$effect.'" src="'.$this->myUrlEncode($image).'"/>';
                 $return .= '
             <div class="input_box">
                 <label for="'.$id.'">
@@ -1043,7 +1043,7 @@ VALUES (:id,:data)
             if( $planet !== 'Grand Tour' ){
                 $image = static::$images_root.'/icons/'.$planet.'.png';
                 $image = '
-                    <img alt="Image:'.$planet.'" src="'.$this->my_urlencode($image).'"/>';
+                    <img alt="Image:'.$planet.'" src="'.$this->myUrlEncode($image).'"/>';
             }else{ $image = ''; }
             $name = $this->de_space($planet.'/Achieved');
             if( ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] ) ){
@@ -1076,7 +1076,7 @@ VALUES (:id,:data)
                     ){ continue; }
                     $image = static::$images_root.'/Asteroid - '.$planet2.'.png';
                     $image = '
-                    <img alt="Image:'.$planet2.'" src="'.$this->my_urlencode($image).'"/>';
+                    <img alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
                     if( // Check for default or posted value.
                         $planet2 === @$_SESSION['ribbons'][$this->de_space($planet.'/Asteroid')]
                     ){
@@ -1188,7 +1188,7 @@ VALUES (:id,:data)
                         
                         $image = static::$images_root.'/icons/'.$device.'.png';
                         $image = '
-                    <img alt="'.$device.'" src="'.$this->my_urlencode($image).'"/>';
+                    <img alt="'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
                         $return .= '
             <div class="input_box">
                 <label for="'.$id.'" title="'.$desc.'">
@@ -1215,7 +1215,7 @@ VALUES (:id,:data)
                     ){ continue; }
                     $image = static::$images_root.'/icons/'.$planet2.'.png';
                     $image = '
-                    <img alt="'.$planet2.'" src="'.$this->my_urlencode($image).'"/>';
+                    <img alt="'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
                     $name = $this->de_space('Grand Tour/'.$planet2);
                     if( // Check for default or posted value.
                         ! empty( $_SESSION['ribbons'][$name] )
