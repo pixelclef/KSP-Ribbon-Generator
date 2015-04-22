@@ -176,7 +176,7 @@ class Ribbons {
         
         // Done setting up.  Now do stuff.
         
-        $this->get_input();
+        $this->getInput();
         $this->generate_image();
         // static::init_database(); // Here for testing, not needed unless save/load fires.
         
@@ -220,48 +220,50 @@ class Ribbons {
         return preg_replace('/_/', ' ', $string);
     }
     
-    private function get_input(){
+    private function getInput() {
         $new_data = false;
-        if( ! empty( $_POST['ribbons_submit'] ) ){
+        if (!empty($_POST['ribbons_submit'])) {
             $new_data = true;
             $_SESSION['ribbons'] = array();
-            foreach( $_POST as $key => $val ){
+            foreach ($_POST as $key => $val) {
                 // Basic post scrubbing.
-                if(
+                if (
                     strlen($val) > 40
                     || strlen($key) > 40
                     || ! $key
                     || ! $val
                     || $val === 'None'
                     || preg_match('/^ribbons_/i',$key)
-                ){ continue; }
+                ) {
+                    // skip this iteration
+                    continue;
+                }
                 $_SESSION['ribbons'][$key] = $val;
             }
-        }else{
+        } else {
             $this->load_ribbons();
-            if( ! isset($_SESSION['ribbons']) ){
-                
+            if (!isset($_SESSION['ribbons'])) {
                 // Set defaults.
                 $_SESSION['ribbons'] = array(
                     'effects/Texture' => 'Ribbon'
                 );
-                
             }
         }
         
         // Loading and defaults are done - do any weird stuff to the data here.
         
-        if( ! empty( $_SESSION['ribbons']['Asteroid/Asteroid'] ) ){
+        if (!empty($_SESSION['ribbons']['Asteroid/Asteroid'])) {
             $_SESSION['ribbons']['Asteroid/Achieved'] = 'on';
-        }else{
+        } else {
             unset($_SESSION['ribbons']['Asteroid/Achieved']);
         }
         
         // Weird stuff done, save if needed.
-        if(
+        if (
             $new_data
-//            AND empty( $_POST['ribbons_generate'] ) // Uncomment to NOT save on Generate (use separate save button).
-        ){
+            // Uncomment the following to NOT save on Generate (use separate save button).
+            // AND empty( $_POST['ribbons_generate'] ) // 
+        ) {
             $this->save_ribbons();
         }
     }
