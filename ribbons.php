@@ -5,7 +5,7 @@ new Ribbons();
 
 $return = '';
 $return1 = '';
-$ribbons = array_reverse(Ribbons::load_all());
+$ribbons = array_reverse(Ribbons::loadAll());
 $ribbons_count = 0;
 $ribbons_hits = 0;
 if(

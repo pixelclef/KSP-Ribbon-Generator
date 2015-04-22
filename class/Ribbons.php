@@ -185,18 +185,23 @@ class Ribbons {
         
     }// END of __construct()
     
-    static public function load_all(){
-        if( ! static::init_database() ){ return; }
-        if(
-            $stmt = static::$dbcnnx->prepare("
-SELECT * FROM ".static::$ribbons_table."
-")
+    static public function loadAll() {
+        if (!static::init_database()) {
+            return;
+        }
+        if (
+            $stmt = static::$dbcnnx->prepare(
+                "SELECT * FROM " . static::$ribbons_table . ""
+            )
             AND $stmt->execute()
             AND $results = $stmt->fetchAll(PDO::FETCH_ASSOC)
-        ){
+        ) {
             $ribbons = array();
-            foreach( $results as $row ){
-                if( ! $row['id'] ){ continue; }
+            foreach ($results as $row) {
+                if (!$row['id']) {
+                    // skip this iteration
+                    continue;
+                }
                 $ribbons[$row['id']] = $row;
             }
             ksort($ribbons);
