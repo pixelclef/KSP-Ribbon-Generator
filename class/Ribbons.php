@@ -177,7 +177,7 @@ class Ribbons {
         // Done setting up.  Now do stuff.
         
         $this->getInput();
-        $this->generate_image();
+        $this->generateImage();
         // static::initDatabase(); // Here for testing, not needed unless save/load fires.
         
         static::$output .= $this->get_preview();
@@ -408,26 +408,33 @@ class Ribbons {
         }
     }
     
-    private function generate_image(){
-        if( empty( $_POST['ribbons_generate'] ) ){ return false; }
+    private function generateImage() {
+        if (empty($_POST['ribbons_generate'])) {
+            return false;
+        }
         $data = array();
         $split_patt = '/^([^\/]+)\/(.+)$/';
         $at_least_one = false;
-        foreach( $_SESSION['ribbons'] as $key => $val ){
-            if( $val === 'None' OR $val === '0' OR $val === 0 ){ continue; }
-            $key = $this->underscoreToSpace( $key );
-            $group = preg_filter($split_patt,'$1',$key);
-            $prop = preg_filter($split_patt,'$2',$key);
-            if( $group === null OR $prop === null ){ continue; }
-            if( ! isset( $data[$group] ) ){
+        foreach ($_SESSION['ribbons'] as $key => $val) {
+            if ($val === 'None' OR $val === '0' OR $val === 0) {
+                // skip this iteration
+                continue;
+            }
+            $key = $this->underscoreToSpace($key);
+            $group = preg_filter($split_patt, '$1', $key);
+            $prop = preg_filter($split_patt, '$2', $key);
+            if ($group === null OR $prop === null) {
+                continue;
+            }
+            if (!isset($data[$group])) {
                 $data[$group] = array();
             }
             $data[$group][$prop] = $val;
-            if($group !== 'effects'){
+            if ($group !== 'effects') {
                 $at_least_one = true;
             }
         }
-        if( ! $at_least_one ){
+        if (!$at_least_one) {
             die('
 <!doctype html>
 <html style="text-align:center;">
@@ -453,126 +460,178 @@ class Ribbons {
         
         // VERY rough.  I'm a total noob at imaging in PHP.
         
-        
-        $base_image = imagecreatetruecolor( (7 * static::$ribbon_width), (3 * static::$ribbon_height) );
+        $base_image = imagecreatetruecolor(
+            (7 * static::$ribbon_width),
+            (3 * static::$ribbon_height)
+        );
         imagesavealpha($base_image, true);
-        $bg = imagecolorallocatealpha($base_image, 0,0,255, 127);
-        imagefill($base_image, 0,0, $bg);
+        $bg = imagecolorallocatealpha($base_image, 0, 0, 255, 127);
+        imagefill($base_image, 0, 0, $bg);
         
         $ribbons = array();
-        foreach($data as $group => $props){
-            if( $group === 'effects' ){ continue; }
-            if(
+        foreach ($data as $group => $props) {
+            if ($group === 'effects') {
+                // skip this iteration
+                continue;
+            }
+            if (
                 $group === 'Asteroid'
-                && ! empty($props['Asteroid'])
-            ){
-                $image_name = 'Asteroid - '.$props['Asteroid'];
-            }elseif( $group === 'Grand Tour' ){
+                && !empty($props['Asteroid'])
+            ) {
+                $image_name = 'Asteroid - ' . $props['Asteroid'];
+            } elseif ($group === 'Grand Tour') {
                 $image_name = 'shield/Base Colours';
-            }else{
+            } else {
                 $image_name = $group;
             }
-            $image = static::$images_root.'/'.$image_name.'.png';
-            if( ! is_readable($image) ){ sleep(5); }
-            if( is_readable($image) AND ! is_dir($image) ){
+            $image = static::$images_root . "/$image_name.png";
+            if (!is_readable($image)) {
+                sleep(5);
+            }
+            if (is_readable($image) AND !is_dir($image)) {
                 $ribbons[$group] = imagecreatefrompng($image);
-            }else{
-                die('<br/>FATAL ERROR: Can\'t read ribbon image: '.$image);
+            } else {
+                die("<br>FATAL ERROR: Can't read ribbon image: '$image'");
             }
             
-            foreach( static::$effects['Textures'] as $effect ){
-                if(
+            foreach (static::$effects['Textures'] as $effect) {
+                if (
                     empty($data['effects'])
-                    OR ! is_array($data['effects'])
-                    OR(
-                        ! in_array($effect, $data['effects'])
-                        AND ! array_key_exists($effect, $data['effects'])
+                    OR !is_array($data['effects'])
+                    OR (
+                        !in_array($effect, $data['effects'])
+                        AND !array_key_exists($effect, $data['effects'])
                     )
-                ){ continue; }
+                ) {
+                    // skip this iteration
+                    continue;
+                }
                 $name = $this->spaceToUnderscore($effect);
                 $image = static::$images_root;
-                if( $group === 'Grand Tour' ){ $image .= '/shield'; }
-                $image .= '/'.$effect.'.png';
+                if ($group === 'Grand Tour') {
+                    $image .= '/shield';
+                }
+                $image .= "/$effect.png";
                 $height = static::$ribbon_height;
-                if( $group === 'Grand Tour' ){
+                if ($group === 'Grand Tour') {
                     $height = (3 * static::$ribbon_height);
                 }
-                if( ! is_readable($image) ){ sleep(5); }
-                if( is_readable($image) AND ! is_dir($image) ){
-                    imagecopy( $ribbons[$group], imagecreatefrompng($image), 0,0,0,0, static::$ribbon_width, $height );
-                }else{
-                    die('<br/>FATAL ERROR: Can\'t read "'.$image.'" for: '.$group.'/'.$prop.'='.$val);
+                if (!is_readable($image)) {
+                    sleep(5);
+                }
+                if (is_readable($image) AND ! is_dir($image)) {
+                    imagecopy(
+                        $ribbons[$group],
+                        imagecreatefrompng($image),
+                        0, 0, 0, 0,
+                        static::$ribbon_width, $height
+                    );
+                } else {
+                    die("<br>FATAL ERROR: Can't read '$image' for: $group/$prop=$val");
                 }
             }
             
-            foreach( static::$devices_ordered as $device ){ // Devices in order of priority.
+            foreach (static::$devices_ordered as $device) { // Devices in order of priority.
                 $type = $device[1];
                 $cat = $device[2];
                 $desc = $device[3];
                 $device = $device[0];
-                if(
-                    ! in_array($device, $props)
-                    AND ! array_key_exists($device, $props)
-                ){ continue; }
+                if (
+                    !in_array($device, $props)
+                    AND !array_key_exists($device, $props)
+                ) {
+                    // skip this iteration
+                    continue;
+                }
                 
                 $image = static::$images_root;
-                if( $group === 'Grand Tour' ){ $image .= '/shield'; }
-                $image .= '/'.$device.'.png';
+                if ($group === 'Grand Tour') {
+                    $image .= '/shield';
+                }
+                $image .= "/$device.png";
                 $height = static::$ribbon_height;
-                if( $group === 'Grand Tour' ){
+                if ($group === 'Grand Tour') {
                     $height = (3 * static::$ribbon_height);
                 }
-                if( ! is_readable($image) ){ sleep(5); }
-                if( is_readable($image) AND ! is_dir($image) ){
-                    imagecopy( $ribbons[$group], imagecreatefrompng($image), 0,0,0,0, static::$ribbon_width, $height );
-                }else{
-                    die('<br/>FATAL ERROR: Can\'t read "'.$image.'" for: '.$group.'/'.$prop.'='.$val);
+                if (!is_readable($image)) {
+                    sleep(5);
+                }
+                if (is_readable($image) AND !is_dir($image)) {
+                    imagecopy(
+                        $ribbons[$group],
+                        imagecreatefrompng($image),
+                        0, 0, 0, 0,
+                        static::$ribbon_width, $height
+                    );
+                } else {
+                    die("<br>FATAL ERROR: Can't read '$image' for: $group/$prop=$val");
                 }
             }
             
-            if( $group === 'Grand Tour' ){
-                foreach( static::$planets as $planet2 => $attribs2 ){
-                    if(
-                        ! in_array($planet2, $props)
-                        AND ! array_key_exists($planet2, $props)
-                    ){ continue; }
-                    if(
+            if ($group === 'Grand Tour') {
+                foreach (static::$planets as $planet2 => $attribs2) {
+                    if (
+                        !in_array($planet2, $props)
+                        AND !array_key_exists($planet2, $props)
+                    ) {
+                        // skip this iteration
+                        continue;
+                    }
+                    if (
                         $planet2 === 'Kerbol'
                         || $planet2 === 'Asteroid'
                         || $planet2 === 'Grand Tour'
-                    ){ continue; }
-                    $image = static::$images_root.'/shield/'.$planet2.' Visit.png';
-                    if( ! is_readable($image) ){ sleep(5); }
-                    if( is_readable($image) AND ! is_dir($image) ){
-                        imagecopy( $ribbons[$group], imagecreatefrompng($image), 0,0,0,0, static::$ribbon_width, (3 * static::$ribbon_height) );
-                    }else{
-                        die('<br/>FATAL ERROR: Can\'t read "'.$image.'" for: '.$group.'/'.$prop.'='.$val);
+                    ) {
+                        // skip this iteration
+                        continue;
+                    }
+                    $image = static::$images_root . "/shield/$planet2 Visit.png";
+                    if (!is_readable($image)) {
+                        sleep(5);
+                    }
+                    if (is_readable($image) AND !is_dir($image)) {
+                        imagecopy(
+                            $ribbons[$group],
+                            imagecreatefrompng($image),
+                            0, 0, 0, 0,
+                            static::$ribbon_width, (3 * static::$ribbon_height)
+                        );
+                    } else {
+                        die("<br>FATAL ERROR: Can't read '$image' for: $group/$prop=$val");
                     }
                 }
                 
-                $o_l = array('Orbit','Landing');
-                foreach( $o_l as $each ){
-                    $$each = array('count'=>'','silvers'=>array(),'golds'=>array());
+                $o_l = array('Orbit', 'Landing');
+                foreach ($o_l as $each) {
+                    $$each = array(
+                        'count'   => '',
+                        'silvers' => array(),
+                        'golds'   => array()
+                    );
                     $this_array = &$$each;
-                    if( ! isset($data['Grand Tour'][$each.'s']) ){ continue; }
-                    $this_array['count'] = 0 + $data['Grand Tour'][$each.'s'];
-                    if( $this_array['count'] > 0 ){
+                    if (!isset($data['Grand Tour'][$each . 's'])) {
+                        // skip this iteration
+                        continue;
+                    }
+                    $this_array['count'] = 0 + $data['Grand Tour'][$each . 's'];
+                    if ($this_array['count'] > 0) {
                         
                         array_push($this_array['golds'], 1);
                         $count_i = $this_array['count']-1;
                         $silvers = 0;
                         $divisor = 7;
-                        while( $count_i > $divisor ){
+                        while ($count_i > $divisor) {
                             $silvers++;
                             $count_i -= 5;
                             $divisor -= 1;
                         }
                         $golds = $this_array['count'] - ($silvers * 5);
                         
-                        $i=2;while( $i <= 8 ){
-                            if( $i <= $silvers + 1 ){
+                        $i = 2;
+                        while ($i <= 8) {
+                            if ($i <= $silvers + 1) {
                                 array_push($this_array['silvers'], $i);
-                            }elseif( $i <= $silvers + $golds ){
+                            } elseif ($i <= $silvers + $golds) {
                                 array_push($this_array['golds'], $i);
                             }
                             $i++;
@@ -581,25 +640,45 @@ class Ribbons {
                     }
                 }
                 
-                $i=1;while($i <= 8){
-                    foreach( array('Orbit','Landing') as $each ){
+                $i=1;
+                while($i <= 8) {
+                    foreach ($o_l as $each) {
                         $this_array = &$$each;
-                        if( ! isset($data['Grand Tour'][$each.'s']) ){ continue; }
-                        $each_count = 0 + $data['Grand Tour'][$each.'s'];
-                        foreach( array('',' Silver') as $each2 ){
-                            if( $each2 AND $i === 1 ){ continue; }
-                            $OLname = $each.' '.$i.$each2;
-                            if( $each2 === '' ){ $each_rl = 'golds'; }
-                            else{ $each_rl = 'silvers'; }
+                        if (!isset($data['Grand Tour'][$each.'s'])) {
+                            // skip this iteration
+                            continue;
+                        }
+                        $each_count = 0 + $data['Grand Tour'][$each . 's'];
+                        foreach (array('', ' Silver') as $each2) {
+                            if ($each2 AND $i === 1) {
+                                // skip this iteration
+                                continue;
+                            }
+                            $OLname = "$each $i$each2";
+                            if ($each2 === '') {
+                                $each_rl = 'golds';
+                            } else {
+                                $each_rl = 'silvers';
+                            }
                             
-                            if( ! in_array( $i, $this_array[$each_rl] ) ){ continue; }
+                            if (!in_array($i, $this_array[$each_rl])) {
+                                // skip this iteration
+                                continue;
+                            }
                             
-                            $image = static::$images_root.'/shield/'.$OLname.'.png';
-                            if( ! is_readable($image) ){ sleep(5); }
-                            if( is_readable($image) AND ! is_dir($image) ){
-                                imagecopy( $ribbons[$group], imagecreatefrompng($image), 0,0,0,0, static::$ribbon_width, (3 * static::$ribbon_height) );
-                            }else{
-                                die('<br/>FATAL ERROR: Can\'t read "'.$image.'" for: '.$group.'/'.$prop.'='.$val);
+                            $image = static::$images_root . "/shield/$OLname.png";
+                            if (!is_readable($image)) {
+                                sleep(5);
+                            }
+                            if (is_readable($image) AND ! is_dir($image)) {
+                                imagecopy(
+                                    $ribbons[$group],
+                                    imagecreatefrompng($image),
+                                    0, 0, 0, 0,
+                                    static::$ribbon_width, (3 * static::$ribbon_height)
+                                );
+                            } else {
+                                die("<br>FATAL ERROR: Can't read '$image' for: $group/$prop=$val");
                             }
                         }
                     }
@@ -607,28 +686,40 @@ class Ribbons {
                 }
             }
             
-            foreach( static::$effects['Bevels'] as $effect ){
-                if(
+            foreach (static::$effects['Bevels'] as $effect) {
+                if (
                     empty($data['effects'])
-                    OR ! is_array($data['effects'])
-                    OR(
-                        ! in_array($effect, $data['effects'])
-                        AND ! array_key_exists($effect, $data['effects'])
+                    OR !is_array($data['effects'])
+                    OR (
+                        !in_array($effect, $data['effects'])
+                        AND !array_key_exists($effect, $data['effects'])
                     )
-                ){ continue; }
+                ) {
+                    // skip this iteration
+                    continue;
+                }
                 $name = $this->spaceToUnderscore($effect);
                 $image = static::$images_root;
-                if( $group === 'Grand Tour' ){ $image .= '/shield'; }
-                $image .= '/'.$effect.'.png';
+                if ($group === 'Grand Tour') {
+                    $image .= '/shield';
+                }
+                $image .= "/$effect.png";
                 $height = static::$ribbon_height;
-                if( $group === 'Grand Tour' ){
+                if ($group === 'Grand Tour') {
                     $height = (3 * static::$ribbon_height);
                 }
-                if( ! is_readable($image) ){ sleep(5); }
-                if( is_readable($image) AND ! is_dir($image) ){
-                    imagecopy( $ribbons[$group], imagecreatefrompng($image), 0,0,0,0, static::$ribbon_width, $height );
-                }else{
-                    die('<br/>FATAL ERROR: Can\'t read "'.$image.'" for: '.$group.'/'.$prop.'='.$val);
+                if (!is_readable($image)) {
+                    sleep(5);
+                }
+                if (is_readable($image) AND ! is_dir($image)) {
+                    imagecopy(
+                        $ribbons[$group],
+                        imagecreatefrompng($image),
+                        0, 0, 0, 0,
+                        static::$ribbon_width, $height
+                    );
+                } else {
+                    die("<br>FATAL ERROR: Can't read '$image' for: $group/$prop=$val");
                 }
             }
             
@@ -643,27 +734,32 @@ class Ribbons {
         $end_w = 0;
         $end_h = 0;
         $occupied = false;
-        foreach( static::$planets as $planet => $attribs ){ // By column, then row.
+        foreach (static::$planets as $planet => $attribs) { // By column, then row.
             // Paint ribbon here.
             $is_on = array_key_exists($planet, $ribbons);
             $height = $cell_h;
-            if( $planet === 'Grand Tour' ){
+            if ($planet === 'Grand Tour') {
                 $height = $cell_h * 3;
             }
-            if( $is_on ){
-                imagecopy($base_image, $ribbons[$planet], $dst_x, $dst_y, 0,0, static::$ribbon_width, $height );
+            if ($is_on) {
+                imagecopy(
+                    $base_image,
+                    $ribbons[$planet],
+                    $dst_x, $dst_y, 0, 0,
+                    static::$ribbon_width, $height
+                );
                 $dst_y += $cell_h;
                 $occupied = true;
-                if( $height > $end_h ){
+                if ($height > $end_h) {
                     $end_h = $height;
                 }
-                if( $dst_y > $end_h ){
+                if ($dst_y > $end_h) {
                     $end_h = $dst_y;
                 }
             }
-            if( ($cell) % 3 === 0 ){
+            if (($cell) % 3 === 0) {
                 $dst_y = 0;
-                if( $occupied ){
+                if ($occupied) {
                     $dst_x += $cell_w;
                     $end_w += $cell_w;
                 }
@@ -671,60 +767,70 @@ class Ribbons {
             }
             $cell++;
         }
-        if( $occupied ){ $end_w += $cell_w; }
+        if ($occupied) {
+            $end_w += $cell_w;
+        }
         
         $resize_factor = 1;
         $end_w_s = $end_w * $resize_factor;
         $end_h_s = $end_h * $resize_factor;
         
         // Crop and resize.
-        $fixed_image = imagecreatetruecolor( $end_w_s, $end_h_s );
+        $fixed_image = imagecreatetruecolor($end_w_s, $end_h_s);
         imagesavealpha($fixed_image, true);
         $bg = imagecolorallocatealpha($fixed_image, 0,0,255, 127);
         imagefill($fixed_image, 0,0, $bg);
-        imagecopyresampled( $fixed_image, $base_image, 0,0, 0,0, $end_w_s, $end_h_s, $end_w, $end_h );
+        imagecopyresampled(
+            $fixed_image,
+            $base_image,
+            0, 0, 0, 0,
+            $end_w_s, $end_h_s,
+            $end_w, $end_h
+        );
         $base_image = $fixed_image;
         
         // Save static image.
-        if(
-            ! empty($_SESSION['logged_in'])
-            AND ! empty($_SESSION['user']['username'])
-        ){
+        if (
+            !empty($_SESSION['logged_in'])
+            AND !empty($_SESSION['user']['username'])
+        ) {
             $username = $_SESSION['user']['username'];
-            $dir = './users/'.$username;
-            if( ! is_writable($dir) ){
+            $dir = "./users/$username";
+            if (!is_writable($dir)) {
                 sleep(5);
-                if( ! is_writable($dir) ){
+                if (!is_writable($dir)) {
                     sleep(5);
-                    if( ! is_writable($dir) ){
+                    if (!is_writable($dir)) {
                         mkdir($dir);
                     }
                 }
             }
-            $image_file = $dir.'/ribbons.png';
-            if( ! imagepng($base_image, $image_file) ){
+            $image_file = "$dir/ribbons.png";
+            if (!imagepng($base_image, $image_file)) {
                 die('Failed to save image to file.');
             }
         }
         
         
         
-// Display image.  For testing.
-//header('Content-Type: image/png'); imagepng($base_image); exit();
+        // Display image.  For testing.
+        //header('Content-Type: image/png'); imagepng($base_image); exit();
         
         // Serve download.
         $filename = 'KSP-Ribbons.png';
         
+        // No semi-colons inside HTTP headers - it ends the line.
         $filename = preg_replace('/;/i', '_', $filename);
-            // No semi-colons inside HTTP headers - it ends the line.
-        header( 'Content-Description: File Transfer' );
-        header( 'Content-Type: application/octet-stream' );
-        header( 'Content-Disposition: attachment; filename="'.$filename.'"' );
-            // filename string double-quoted to handle spaces.
-        header( 'Content-Transfer-Encoding: binary' );
-        header( 'Expires: 0' );
-        header( 'Cache-Control: must-revalidate' );
-        header( 'Pragma: public' );
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+
+        // filename string double-quoted to handle spaces.
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
         imagepng($base_image);
         exit;
     }
