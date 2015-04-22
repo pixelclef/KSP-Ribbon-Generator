@@ -268,7 +268,7 @@ class Ribbons {
         }
     }
     
-    static private function initDatabase(){
+    static private function initDatabase() {
         // Robust file check for sleepy servers.
         if (!is_writable(static::$db_file) || !is_writable(dirname(static::$db_file))) {
             sleep(5);
