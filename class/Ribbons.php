@@ -27,7 +27,7 @@ class Ribbons {
     ,$user_id = null
     ;
     
-    function __construct(){
+    public function __construct() {
         static::$planets = array( // In order of display, by column then row.
             'Kerbol'        =>'0010001'
             ,'Moho'         =>'1010001'
@@ -56,9 +56,9 @@ class Ribbons {
             ,'Grand Tour'   =>'1100000'
         );
         $planet_attributes = array('Surface', 'Atmosphere', 'Geosynchronous', 'Anomaly', 'Challenge Wreath', 'Extreme EVA', 'Asteroid'); // Number strings above.
-        foreach( static::$planets as $planet => $attribs ){
+        foreach (static::$planets as $planet => $attribs) {
             static::$planets[$planet] = array();
-            foreach( $planet_attributes as $key => $val ){
+            foreach ($planet_attributes as $key => $val) {
                 static::$planets[$planet][$val] = !!@$attribs[$key]; // Strings are ~like arrays.
             }
         }
@@ -150,24 +150,27 @@ class Ribbons {
             ,'Rover'
         );
         static::$devices_ordered = array();
-        foreach( static::$devices as $cat => $types ){
-            if( $cat === 'Crafts' ){ continue; }
-            foreach( $types as $type => $devices ){
-                foreach( $devices as $device => $details ){
+        foreach (static::$devices as $cat => $types) {
+            if ($cat === 'Crafts') {
+                // skip this iteration
+                continue;
+            }
+            foreach ($types as $type => $devices) {
+                foreach ($devices as $device => $details) {
                     static::$devices_ordered[$details[0]] = array($device, $type, $cat, $details[1]);
                 }
             }
         }
         ksort(static::$devices_ordered);
-        foreach( static::$devices['Crafts'] as $type => $crafts ){
-            foreach( $crafts as $craft => $details ){
+        foreach (static::$devices['Crafts'] as $type => $crafts) {
+            foreach ($crafts as $craft => $details) {
                 static::$devices_ordered[] = array($craft, $type, $cat, $details[1]);
             }
         }
         
-        if( isset($_SESSION['user']['id']) ){
+        if (isset($_SESSION['user']['id'])) {
             static::$user_id = $_SESSION['user']['id'];
-        }elseif( isset($_SESSION['user_id']) ){
+        } elseif (isset($_SESSION['user_id'])) {
             static::$user_id = $_SESSION['user_id'];
         }
         
@@ -175,7 +178,7 @@ class Ribbons {
         
         $this->get_input();
         $this->generate_image();
-//        static::init_database(); // Here for testing, not needed unless save/load fires.
+        // static::init_database(); // Here for testing, not needed unless save/load fires.
         
         static::$output .= $this->get_preview();
         static::$output .= $this->get_form();
