@@ -241,7 +241,7 @@ class Ribbons {
                 $_SESSION['ribbons'][$key] = $val;
             }
         } else {
-            $this->load_ribbons();
+            $this->loadRibbons();
             if (!isset($_SESSION['ribbons'])) {
                 // Set defaults.
                 $_SESSION['ribbons'] = array(
@@ -320,31 +320,33 @@ class Ribbons {
         return true;
     }
 
-    private function load_ribbons(){
-        if( static::$user_id === null ){ return false; }
+    private function loadRibbons() {
+        if (static::$user_id === null) {
+            return false;
+        }
         static::initDatabase();
-        if(
-            $stmt = static::$dbcnnx->prepare("
-SELECT data FROM ".static::$ribbons_table."
-WHERE id=:id
-LIMIT 1
-")
+        if (
+            $stmt = static::$dbcnnx->prepare(
+                "SELECT data FROM " . static::$ribbons_table . 
+                "WHERE id=:id " .
+                "LIMIT 1"
+            )
             AND $stmt->bindValue(':id', static::$user_id, PDO::PARAM_INT)
             AND $stmt->execute()
             AND $result = $stmt->fetch(PDO::FETCH_ASSOC)
-        ){
-            if(
-                ! empty($result['data'])
-            ){
-                if( ! $data = explode('|',$result['data']) ){
+        ) {
+            if (
+                !empty($result['data'])
+            ) {
+                if (!$data = explode('|', $result['data'])) {
                     die('Can\'t read db data.');
                 }
                 $_SESSION['ribbons'] = array();
                 $split_patt = '/^([^=]*)=(.*)$/';
-                foreach($data as $pair){
+                foreach ($data as $pair) {
                     $prop = preg_filter($split_patt,'$1',$pair);
                     $val = preg_filter($split_patt,'$2',$pair);
-                    if( $prop AND $val ){
+                    if ($prop AND $val) {
                         $_SESSION['ribbons'][$prop] = $val;
                     }
                 }
