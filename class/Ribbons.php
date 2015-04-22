@@ -264,7 +264,7 @@ class Ribbons {
             // Uncomment the following to NOT save on Generate (use separate save button).
             // AND empty( $_POST['ribbons_generate'] ) // 
         ) {
-            $this->save_ribbons();
+            $this->saveRibbons();
         }
     }
     
