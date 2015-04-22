@@ -178,7 +178,7 @@ class Ribbons {
         
         $this->getInput();
         $this->generate_image();
-        // static::init_database(); // Here for testing, not needed unless save/load fires.
+        // static::initDatabase(); // Here for testing, not needed unless save/load fires.
         
         static::$output .= $this->get_preview();
         static::$output .= $this->get_form();
@@ -186,7 +186,7 @@ class Ribbons {
     }// END of __construct()
     
     static public function loadAll() {
-        if (!static::init_database()) {
+        if (!static::initDatabase()) {
             return;
         }
         if (
@@ -268,52 +268,53 @@ class Ribbons {
         }
     }
     
-    static private function init_database(){
+    static private function initDatabase(){
         // Robust file check for sleepy servers.
-        if( !is_writable(static::$db_file) || !is_writable(dirname(static::$db_file)) ){
+        if (!is_writable(static::$db_file) || !is_writable(dirname(static::$db_file))) {
             sleep(5);
-            if( !is_writable(static::$db_file) || !is_writable(dirname(static::$db_file)) ){
+            if (!is_writable(static::$db_file) || !is_writable(dirname(static::$db_file))) {
                 sleep(5);
-                if( !is_writable(static::$db_file) || !is_writable(dirname(static::$db_file)) ){
+                if (!is_writable(static::$db_file) || !is_writable(dirname(static::$db_file))) {
                     die('FATAL ERROR: The database file or directory doesn\'t exist or isn\'t writeable.');
                 }
             }
         }
-        if( ! empty( static::$dbcnnx ) ){ return true; }
-        try{
-            static::$dbcnnx = new PDO('sqlite:'.static::$db_file);
+        if (!empty(static::$dbcnnx)) {
+            return true;
         }
-        catch( PDOException $Exception ){
+        try {
+            static::$dbcnnx = new PDO('sqlite:' . static::$db_file);
+        } catch (PDOException $Exception) {
             static::$dbcnnx = false;
             die('FATAL ERROR: An exception occurred when opening the database.');
         }
-        if(
-            $stmt = static::$dbcnnx->prepare("
-SELECT name FROM sqlite_master
-WHERE type='table' AND name='".static::$ribbons_table."';
-")
+        if (
+            $stmt = static::$dbcnnx->prepare(
+                "SELECT name FROM sqlite_master " .
+                "WHERE type='table' AND name='" . static::$ribbons_table . "';"
+            )
             AND $stmt->execute()
             AND $result = $stmt->fetch(PDO::FETCH_ASSOC)
-        ){
+        ) {
             $table_exists = true;
-        }elseif(
-            $stmt = static::$dbcnnx->prepare("
-CREATE TABLE ".static::$ribbons_table."(
-id INTEGER NOT NULL UNIQUE
-,data TEXT NOT NULL
-);
-")
+        } elseif (
+            $stmt = static::$dbcnnx->prepare(
+                "CREATE TABLE " . static::$ribbons_table . "(" .
+                    "id INTEGER NOT NULL UNIQUE, " .
+                    "data TEXT NOT NULL" . 
+                ");"
+            )
             AND $stmt->execute()
-            AND $stmt = static::$dbcnnx->prepare("
-INSERT INTO ".static::$ribbons_table." (id,data)
-VALUES (0,'Admin/DefaultData')
-")
+            AND $stmt = static::$dbcnnx->prepare(
+                "INSERT INTO " . static::$ribbons_table . " (id,data) " .
+                "VALUES (0,'Admin/DefaultData')"
+            )
             AND $stmt->execute()
             AND $stmt->rowCount()
-        ){
+        ) {
             $table_created = true;
             die('NOTICE: A new table was created and tested. Please try again.');
-        }else{
+        } else {
             die('FATAL ERROR: Table creation failed.');
         }
         return true;
@@ -321,7 +322,7 @@ VALUES (0,'Admin/DefaultData')
 
     private function load_ribbons(){
         if( static::$user_id === null ){ return false; }
-        static::init_database();
+        static::initDatabase();
         if(
             $stmt = static::$dbcnnx->prepare("
 SELECT data FROM ".static::$ribbons_table."
@@ -357,7 +358,7 @@ LIMIT 1
             $id === null
             OR ! isset($_SESSION['ribbons'])
         ){ return false; }
-        static::init_database();
+        static::initDatabase();
         $data = '';
         $i = count($_SESSION['ribbons']);
         foreach( $_SESSION['ribbons'] as $key => $val ){
