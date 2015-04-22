@@ -213,11 +213,11 @@ class Ribbons {
         return preg_replace('/\s/', '%20', $url);
     }
     
-    private function de_space($in_out){
-        return preg_replace('/\s+/','_',$in_out);
+    private function spaceToUnderscore($string) {
+        return preg_replace('/\s+/', '_', $string);
     }
-    private function re_space($in_out){
-        return preg_replace('/_/',' ',$in_out);
+    private function underscoreToSpace($string) {
+        return preg_replace('/_/', ' ', $string);
     }
     
     private function get_input(){
@@ -405,7 +405,7 @@ VALUES (:id,:data)
         $at_least_one = false;
         foreach( $_SESSION['ribbons'] as $key => $val ){
             if( $val === 'None' OR $val === '0' OR $val === 0 ){ continue; }
-            $key = $this->re_space( $key );
+            $key = $this->underscoreToSpace( $key );
             $group = preg_filter($split_patt,'$1',$key);
             $prop = preg_filter($split_patt,'$2',$key);
             if( $group === null OR $prop === null ){ continue; }
@@ -479,7 +479,7 @@ VALUES (:id,:data)
                         AND ! array_key_exists($effect, $data['effects'])
                     )
                 ){ continue; }
-                $name = $this->de_space($effect);
+                $name = $this->spaceToUnderscore($effect);
                 $image = static::$images_root;
                 if( $group === 'Grand Tour' ){ $image .= '/shield'; }
                 $image .= '/'.$effect.'.png';
@@ -606,7 +606,7 @@ VALUES (:id,:data)
                         AND ! array_key_exists($effect, $data['effects'])
                     )
                 ){ continue; }
-                $name = $this->de_space($effect);
+                $name = $this->spaceToUnderscore($effect);
                 $image = static::$images_root;
                 if( $group === 'Grand Tour' ){ $image .= '/shield'; }
                 $image .= '/'.$effect.'.png';
@@ -746,17 +746,17 @@ VALUES (:id,:data)
             <img class="ribbon_image" alt="'.$planet.'" src="'.$this->myUrlEncode($image).'"/>';
             }else{ $image = ''; }
             if(
-                ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] )
+                ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
             ){
                 $selected = ' selected';
             }else{ $selected = ''; }
             
             $name_vis = '';
-            if( ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] ) ){
+            if( ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] ) ){
                 $name_vis = ' style="opacity:0;"';
             }
             $return .= '
-        <div  title="'.$planet.'" class="ribbon '.$this->de_space($planet).$selected.'" style="'.$height.'">'.$image.'
+        <div  title="'.$planet.'" class="ribbon '.$this->spaceToUnderscore($planet).$selected.'" style="'.$height.'">'.$image.'
             <span class="title"'.$name_vis.'>'.$planet.'</span>';
             
             // BEGIN Ribbon guts.
@@ -768,20 +768,20 @@ VALUES (:id,:data)
                         || $planet2 === 'Asteroid'
                     ){ continue; }
                     if( // Check for default or posted value.
-                        $planet2 === @$_SESSION['ribbons'][$this->de_space($planet.'/Asteroid')]
-                        AND ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] )
+                        $planet2 === @$_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Asteroid')]
+                        AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
                     ){
                         $selected = ' selected';
                     }else{ $selected = ''; }
                     $image = static::$images_root.'/Asteroid - '.$planet2.'.png';
                     $image = '
-            <img class="device '.$this->de_space($planet2).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
+            <img class="device '.$this->spaceToUnderscore($planet2).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
                     $return .= $image;
                 }
             }
             
             foreach( static::$effects['Textures'] as $effect ){
-                $name = $this->de_space($effect);
+                $name = $this->spaceToUnderscore($effect);
                 if( // Check for default or posted value.
                     (
                         $effect === @$_SESSION['ribbons']['effects/Texture']
@@ -825,10 +825,10 @@ VALUES (:id,:data)
                 }
                 if( // Check for default or posted value.
                     (
-                        ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/'.$device)] )
-                        || $device === @$_SESSION['ribbons'][$this->de_space($planet.'/craft')]
+                        ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/'.$device)] )
+                        || $device === @$_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/craft')]
                     )
-                    AND ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] )
+                    AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
                 ){
                     $selected = ' selected';
                 }else{ $selected = ''; }
@@ -836,7 +836,7 @@ VALUES (:id,:data)
                 if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
                 $image .= '/'.$device.'.png';
                 $image = '
-            <img class="device '.$this->de_space($device).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
+            <img class="device '.$this->spaceToUnderscore($device).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
                 $return .= $image;
             }
             
@@ -848,14 +848,14 @@ VALUES (:id,:data)
                         || $planet2 === 'Grand Tour'
                     ){ continue; }
                     if( // Check for default or posted value.
-                        ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/'.$planet2)] )
-                        AND ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] )
+                        ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/'.$planet2)] )
+                        AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
                     ){
                         $selected = ' selected';
                     }else{ $selected = ''; }
                     $image = static::$images_root.'/shield/'.$planet2.' Visit.png';
                     $image = '
-            <img class="device '.$this->de_space($planet2).$selected.'" alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
+            <img class="device '.$this->spaceToUnderscore($planet2).$selected.'" alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
                     $return .= $image;
                 }
                 
@@ -900,13 +900,13 @@ VALUES (:id,:data)
                             else{ $each_rl = 'silvers'; }
                             if( // Check for default or posted value.
                                 in_array( $i, $this_array[$each_rl] )
-                                AND ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] )
+                                AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
                             ){
                                 $selected = ' selected';
                             }else{ $selected = ''; }
                             $image = static::$images_root.'/shield/'.$OLname.'.png';
                             $image = '
-            <img class="device '.$this->de_space($OLname).$selected.'" alt="Image:'.$OLname.'" src="'.$this->myUrlEncode($image).'"/>';
+            <img class="device '.$this->spaceToUnderscore($OLname).$selected.'" alt="Image:'.$OLname.'" src="'.$this->myUrlEncode($image).'"/>';
                             $return .= $image;
                         }
                     }
@@ -915,7 +915,7 @@ VALUES (:id,:data)
             }
             
             foreach( static::$effects['Bevels'] as $effect ){
-                $name = $this->de_space($effect);
+                $name = $this->spaceToUnderscore($effect);
                 if( // Check for default or posted value.
                     (
                         $effect === @$_SESSION['ribbons']['effects/Texture']
@@ -980,18 +980,18 @@ VALUES (:id,:data)
         <h3 class="title">Effects</h3>';
         foreach( static::$effects as $type => $effects ){
             $return .= '
-        <div class="category '.$this->de_space($type).'">';
+        <div class="category '.$this->spaceToUnderscore($type).'">';
             $first_texture = true;
             foreach( $effects as $effect ){
                 $input_type = 'checkbox';
-                $name = $this->de_space('effects/'.$effect);
+                $name = $this->spaceToUnderscore('effects/'.$effect);
                 $id = $name;
                 $value = '';
                 $checked = '';
                 
                 if( $type === 'Textures' ){
                     $name = 'effects/Texture';
-                    $id = $this->de_space($name.'/'.$effect);
+                    $id = $this->spaceToUnderscore($name.'/'.$effect);
                     $value = ' value="'.$effect.'"';
                     $input_type = 'radio';
                     if( $effect === @$_SESSION['ribbons'][$name] ){
@@ -1034,7 +1034,7 @@ VALUES (:id,:data)
         
         foreach( static::$planets as $planet => $attribs ){
             $return .= '
-    <div class="planet '.$this->de_space($planet).'">
+    <div class="planet '.$this->spaceToUnderscore($planet).'">
         <hr/>
         <h3 class="title">'.$planet.'</h3>';
             
@@ -1045,8 +1045,8 @@ VALUES (:id,:data)
                 $image = '
                     <img alt="Image:'.$planet.'" src="'.$this->myUrlEncode($image).'"/>';
             }else{ $image = ''; }
-            $name = $this->de_space($planet.'/Achieved');
-            if( ! empty( $_SESSION['ribbons'][$this->de_space($planet.'/Achieved')] ) ){
+            $name = $this->spaceToUnderscore($planet.'/Achieved');
+            if( ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] ) ){
                 $checked = ' checked="checked"';
             }else{ $checked = ''; }
             if( $planet === 'Asteroid' ){
@@ -1078,12 +1078,12 @@ VALUES (:id,:data)
                     $image = '
                     <img alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
                     if( // Check for default or posted value.
-                        $planet2 === @$_SESSION['ribbons'][$this->de_space($planet.'/Asteroid')]
+                        $planet2 === @$_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Asteroid')]
                     ){
                         $checked = ' checked="checked"';
                     }else{ $checked = ''; }
                     $name = 'Asteroid/Asteroid';
-                    $id = $name.'/'.$this->de_space($planet2);
+                    $id = $name.'/'.$this->spaceToUnderscore($planet2);
                     $return .= '
             <div class="input_box Asteroid">
                 <label for="'.$id.'">
@@ -1136,7 +1136,7 @@ VALUES (:id,:data)
             
             foreach( static::$devices as $cat => $types ){
                 $return .= '
-        <div class="category '.$this->de_space($cat).'">';
+        <div class="category '.$this->spaceToUnderscore($cat).'">';
                 $first_craft = true;
                 foreach( $types as $type => $devices ){
                     foreach( $devices as $device => $details ){
@@ -1158,14 +1158,14 @@ VALUES (:id,:data)
                             AND ! in_array( $device, static::$gt_devices )
                         ){ continue; }
                         $input_type = 'checkbox';
-                        $name = $this->de_space($planet.'/'.$device);
+                        $name = $this->spaceToUnderscore($planet.'/'.$device);
                         $id = $name;
                         $value = '';
                         $checked = '';
                         
                         if( $cat === 'Crafts' ){
-                            $name = $this->de_space($planet.'/craft');
-                            $id = $this->de_space($name.'/'.$device);
+                            $name = $this->spaceToUnderscore($planet.'/craft');
+                            $id = $this->spaceToUnderscore($name.'/'.$device);
                             $value = ' value="'.$device.'"';
                             $input_type = 'radio';
                             if( $device === @$_SESSION['ribbons'][$name] ){
@@ -1216,7 +1216,7 @@ VALUES (:id,:data)
                     $image = static::$images_root.'/icons/'.$planet2.'.png';
                     $image = '
                     <img alt="'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
-                    $name = $this->de_space('Grand Tour/'.$planet2);
+                    $name = $this->spaceToUnderscore('Grand Tour/'.$planet2);
                     if( // Check for default or posted value.
                         ! empty( $_SESSION['ribbons'][$name] )
                     ){
