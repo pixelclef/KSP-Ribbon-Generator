@@ -180,7 +180,7 @@ class Ribbons {
         $this->generateImage();
         // static::initDatabase(); // Here for testing, not needed unless save/load fires.
         
-        static::$output .= $this->get_preview();
+        static::$output .= $this->getPreview();
         static::$output .= $this->get_form();
         
     }// END of __construct()
@@ -354,7 +354,7 @@ class Ribbons {
         }
     }
     
-    private function saveRibbons(){
+    private function saveRibbons() {
         $id = static::$user_id;
         if (
             $id === null
@@ -835,63 +835,71 @@ class Ribbons {
         exit;
     }
 
-    private function get_preview(){
+    private function getPreview() {
         $return = '';
         $return .= '
 <div style="clear:both;"></div>
 <div style="text-align:center;"><small>Click each ribbon to select your awards.</small></div>
 <div id="ribbons_output" class="ribbons">';
-        $ri=0;
-        foreach( static::$planets as $planet => $attribs ){
+        $ri = 0;
+        foreach (static::$planets as $planet => $attribs) {
             $ri++;
-            if( ($ri-1) % 3 === 0 ){
-                if( $ri > 1 ){
-                    $return .= '
-    </div>';
+            if (($ri - 1) % 3 === 0) {
+                if ($ri > 1) {
+                    $return .= '</div>';
                 }
-                $return .= '
-    <div class="column">';
+                $return .= '<div class="column">';
             }
-            $image = static::$images_root.'/'.$planet.'.png';
-            if( $planet === 'Grand Tour' ){
-                $image = static::$images_root.'/shield/Base Colours.png';
-                $height = 'height:'.(3*static::$ribbon_height).'px;line-height:'.(3*static::$ribbon_height).'px;';
-            }else{ $height = ''; }
-            if( $planet !== 'Asteroid' ){
-                $image = '
-            <img class="ribbon_image" alt="'.$planet.'" src="'.$this->myUrlEncode($image).'"/>';
-            }else{ $image = ''; }
-            if(
-                ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
-            ){
+            $image = static::$images_root . "/$planet.png";
+            if ($planet === 'Grand Tour') {
+                $image = static::$images_root . '/shield/Base Colours.png';
+                $height = 'height:' . (3 * static::$ribbon_height) . 'px;line-height:' . (3 * static::$ribbon_height) . 'px;';
+            } else {
+                $height = '';
+            }
+            if ($planet !== 'Asteroid') {
+                $image = '<img class="ribbon_image" alt="' . $planet . '" src="' . $this->myUrlEncode($image) . '"/>';
+            } else {
+                $image = '';
+            }
+            if (
+                !empty($_SESSION['ribbons'][$this->spaceToUnderscore($planet . '/Achieved')])
+            ) {
                 $selected = ' selected';
-            }else{ $selected = ''; }
+            } else {
+                $selected = '';
+            }
             
             $name_vis = '';
-            if( ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] ) ){
+            if (!empty($_SESSION['ribbons'][$this->spaceToUnderscore($planet . '/Achieved')])) {
                 $name_vis = ' style="opacity:0;"';
             }
             $return .= '
-        <div  title="'.$planet.'" class="ribbon '.$this->spaceToUnderscore($planet).$selected.'" style="'.$height.'">'.$image.'
-            <span class="title"'.$name_vis.'>'.$planet.'</span>';
+        <div title="' . $planet . '" class="ribbon ' . $this->spaceToUnderscore($planet) . $selected . '" style="' . $height . '">' . $image . '
+            <span class="title"' . $name_vis . '>' . $planet . '</span>';
             
             // BEGIN Ribbon guts.
             
-            if( $planet === 'Asteroid' ){
-                foreach( static::$planets as $planet2 => $attribs2 ){
-                    if(
-                        empty( $attribs2['Asteroid'] )
+            if ($planet === 'Asteroid') {
+                foreach (static::$planets as $planet2 => $attribs2) {
+                    if (
+                        empty($attribs2['Asteroid'])
                         || $planet2 === 'Asteroid'
-                    ){ continue; }
-                    if( // Check for default or posted value.
+                    ) {
+                        // skip this iteration
+                        continue;
+                    }
+                    if ( // Check for default or posted value.
                         $planet2 === @$_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Asteroid')]
-                        AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
-                    ){
+                        AND !empty($_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')])
+                    ) {
                         $selected = ' selected';
-                    }else{ $selected = ''; }
-                    $image = static::$images_root.'/Asteroid - '.$planet2.'.png';
+                    } else {
+                        $selected = '';
+                    }
+                    $image = static::$images_root . "/Asteroid - $planet2.png";
                     $image = '
-            <img class="device '.$this->spaceToUnderscore($planet2).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
+            <img class="device ' . $this->spaceToUnderscore($planet2) . $selected . '" alt="Image:' . $device . '" src="' . $this->myUrlEncode($image) . '"/>';
                     $return .= $image;
                 }
             }
