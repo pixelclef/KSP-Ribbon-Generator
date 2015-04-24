@@ -181,7 +181,7 @@ class Ribbons {
         // static::initDatabase(); // Here for testing, not needed unless save/load fires.
         
         static::$output .= $this->getPreview();
-        static::$output .= $this->get_form();
+        static::$output .= $this->getForm();
         
     }// END of __construct()
     
@@ -1114,301 +1114,295 @@ class Ribbons {
         return $return;
     }
     
-    private function get_form(){
+    private function getForm() {
         $return = '';
         $submit_message = '<strong>You\'re <em>not</em> logged in.</strong> Settings will be lost when you leave.';
-        if( static::$user_id !== null ){
+        if (static::$user_id !== null) {
             $submit_message = '<strong>You\'re logged in!</strong> Settings will be remembered.';
         }
-        $return .= '
-<div style="clear:both;"></div>
-<form class="ribbons" method="post"><fieldset>
-    <div class="submit">
-        '.$submit_message.'
-        <input type="hidden" name="ribbons_submit" value="default"/>';
-//        $return .= '\r\n        <input title="Save these ribbons." type="submit" name="ribbons_save" value="Save"/>';
+        $return .= '<div style="clear:both;"></div>
+            <form class="ribbons" method="post"><fieldset>
+            <div class="submit">' . $submit_message . 
+            '<input type="hidden" name="ribbons_submit" value="default"/>';
+            
+        // $return .= '\r\n        <input title="Save these ribbons." type="submit" name="ribbons_save" value="Save"/>';
+        
         $butt_text = empty($_SESSION['logged_in']) ? 'Generate' : 'Save &amp; Generate';
-        $return .= '
-        &nbsp;&nbsp;
-        <small><input class="generate" title="Save and generate a downloadable image." type="submit" name="ribbons_generate" value="'.$butt_text.'"/></small>
-        &nbsp;&nbsp;
-        <small><input title="Revert to your last save." type="reset" value="Cancel"/></small>
-        <hr/>
-    </div>
-    ';
+        $return .= '&nbsp;&nbsp;
+            <small><input class="generate" title="Save and generate a downloadable image." type="submit" name="ribbons_generate" value="'.$butt_text.'"/></small>
+            &nbsp;&nbsp;
+            <small><input title="Revert to your last save." type="reset" value="Cancel"/></small>
+            <hr/>
+            </div>';
         
         // Submit:
         
         // Effects:
-            $return .= '
-    <div class="effects">
-        <h3 class="title">Effects</h3>';
-        foreach( static::$effects as $type => $effects ){
-            $return .= '
-        <div class="category '.$this->spaceToUnderscore($type).'">';
+        $return .= '<div class="effects">
+            <h3 class="title">Effects</h3>';
+        foreach (static::$effects as $type => $effects) {
+            $return .= '<div class="category ' . $this->spaceToUnderscore($type) . '">';
             $first_texture = true;
-            foreach( $effects as $effect ){
+            foreach ($effects as $effect) {
                 $input_type = 'checkbox';
-                $name = $this->spaceToUnderscore('effects/'.$effect);
+                $name = $this->spaceToUnderscore("effects/$effect");
                 $id = $name;
                 $value = '';
                 $checked = '';
                 
-                if( $type === 'Textures' ){
+                if ($type === 'Textures') {
                     $name = 'effects/Texture';
-                    $id = $this->spaceToUnderscore($name.'/'.$effect);
-                    $value = ' value="'.$effect.'"';
+                    $id = $this->spaceToUnderscore("$name/$effect");
+                    $value = ' value="' . $effect . '"';
                     $input_type = 'radio';
-                    if( $effect === @$_SESSION['ribbons'][$name] ){
+                    if ($effect === @$_SESSION['ribbons'][$name]) {
                         $checked = ' checked="checked"';
                     }
-                    if( $first_texture ){
-                        if( empty( $_SESSION['ribbons'][$name] ) ){
+                    if ($first_texture) {
+                        if (empty($_SESSION['ribbons'][$name])) {
                             $checked2 = ' checked="checked"';
-                        }else{ $checked2 = ''; }
+                        } else {
+                            $checked2 = '';
+                        }
                         $first_texture = false;
-                        $return .= '
-            <div class="input_box">
-                <label for="'.$id.'/None">No Texture</label>
-                <input type="'.$input_type.'" id="'.$id.'/None" name="'.$name.'" value="None"'.$checked2.'/>
-            </div>';
+                        $return .= '<div class="input_box">
+                            <label for="' . $id . '/None">No Texture</label>
+                            <input type="' . $input_type . '" id="' . $id . 
+                            '/None" name="' . $name . '" value="None"' . $checked2 . 
+                            '/></div>';
                     }
-                }elseif( ! empty( $_SESSION['ribbons'][$name] ) ){
+                } elseif (!empty($_SESSION['ribbons'][$name])) {
                     $checked = ' checked="checked"';
                 }
                 
-                $image = static::$images_root.'/'.$effect.'.png';
-                $image = '
-                    <img alt="Image:'.$effect.'" src="'.$this->myUrlEncode($image).'"/>';
-                $return .= '
-            <div class="input_box">
-                <label for="'.$id.'">
-                    '.$effect.$image.'
-                </label>
-                <input type="'.$input_type.'" id="'.$id.'" name="'.$name.'"'.$value.$checked.'/>
-            </div>';
+                $image = static::$images_root . "/$effect.png";
+                $image = '<img alt="Image:' . $effect . '" src="' . 
+                    $this->myUrlEncode($image) . '"/>';
+                $return .= '<div class="input_box">
+                    <label for="' . $id . '">' . $effect . $image . 
+                    '</label><input type="' . $input_type . '" id="' . $id . 
+                    '" name="' . $name . '"' . $value . $checked . '/></div>';
             }
-            $return .= '
-            <div style="clear:both;"></div>
-        </div>';
+            $return .= '<div style="clear:both;"></div>
+                </div>';
         }
-        $return .= '
-    </div>';
+        $return .= '</div>';
         
         // Planets:
         
-        foreach( static::$planets as $planet => $attribs ){
-            $return .= '
-    <div class="planet '.$this->spaceToUnderscore($planet).'">
-        <hr/>
-        <h3 class="title">'.$planet.'</h3>';
+        foreach (static::$planets as $planet => $attribs) {
+            $return .= '<div class="planet ' . $this->spaceToUnderscore($planet) . 
+                '"><hr/><h3 class="title">' . $planet . '</h3>';
             
             // BEGIN Planet guts.
             
-            if( $planet !== 'Grand Tour' ){
-                $image = static::$images_root.'/icons/'.$planet.'.png';
-                $image = '
-                    <img alt="Image:'.$planet.'" src="'.$this->myUrlEncode($image).'"/>';
-            }else{ $image = ''; }
-            $name = $this->spaceToUnderscore($planet.'/Achieved');
-            if( ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] ) ){
+            if ($planet !== 'Grand Tour') {
+                $image = static::$images_root . "/icons/$planet.png";
+                $image = '<img alt="Image:' . $planet . '" src="' . 
+                    $this->myUrlEncode($image) . '"/>';
+            } else {
+                $image = '';
+            }
+            $name = $this->spaceToUnderscore("$planet/Achieved");
+            if (!empty($_SESSION['ribbons'][$this->spaceToUnderscore("$planet/Achieved")])) {
                 $checked = ' checked="checked"';
-            }else{ $checked = ''; }
-            if( $planet === 'Asteroid' ){
+            } else {
+                $checked = '';
+            }
+            if ($planet === 'Asteroid') {
                 $disabled = ' disabled="disabled"';
-            }else{ $disabled = ''; }
-            $return .= '
-        <div class="category Achieved">
-            <div class="input_box Achieved">
-                <label for="'.$name.'">
-                    '.$image.'
-                </label>
-                <input type="checkbox" id="'.$name.'" name="'.$name.'"'.$checked.$disabled.'/>
-            </div>';
-            if( $planet === 'Asteroid' ){
-                if( empty( $_SESSION['ribbons']['Asteroid/Asteroid'] ) ){
+            } else {
+                $disabled = '';
+            }
+            $return .= '<div class="category Achieved">
+                <div class="input_box Achieved">
+                <label for="' . $name . '">' . $image . '</label>
+                <input type="checkbox" id="' . $name . '" name="' . $name . '"' . 
+                $checked . $disabled . '/></div>';
+            if ($planet === 'Asteroid') {
+                if (empty($_SESSION['ribbons']['Asteroid/Asteroid'])) {
                     $checked = ' checked="checked"';
-                }else{ $checked = ''; }
-                $return .= '
-            <div class="input_box Asteroid">
-                <label for="Asteroid/Asteroid/None">No Asteroid</label>
-                <input type="radio" id="Asteroid/Asteroid/None" name="Asteroid/Asteroid" value="None"'.$checked.'/>
-            </div>';
-                foreach( static::$planets as $planet2 => $attribs2 ){
-                    if(
-                        empty( $attribs2['Asteroid'] )
-                        || $planet2 === 'Asteroid'
-                    ){ continue; }
-                    $image = static::$images_root.'/Asteroid - '.$planet2.'.png';
-                    $image = '
-                    <img alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
-                    if( // Check for default or posted value.
-                        $planet2 === @$_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Asteroid')]
-                    ){
-                        $checked = ' checked="checked"';
-                    }else{ $checked = ''; }
-                    $name = 'Asteroid/Asteroid';
-                    $id = $name.'/'.$this->spaceToUnderscore($planet2);
-                    $return .= '
-            <div class="input_box Asteroid">
-                <label for="'.$id.'">
-                    '.$planet2.$image.'
-                </label>
-                <input type="radio" id="'.$id.'" name="'.$name.'" value="'.$planet2.'"'.$checked.'/>
-            </div>';
+                } else {
+                    $checked = '';
                 }
-            }elseif( $planet === 'Grand Tour' ){
+                $return .= '<div class="input_box Asteroid">
+                    <label for="Asteroid/Asteroid/None">No Asteroid</label>
+                    <input type="radio" id="Asteroid/Asteroid/None" ' . 
+                    'name="Asteroid/Asteroid" value="None"' . $checked . '/></div>';
+                foreach (static::$planets as $planet2 => $attribs2) {
+                    if (
+                        empty($attribs2['Asteroid'])
+                        || $planet2 === 'Asteroid'
+                    ) {
+                        // skip this iteration
+                        continue;
+                    }
+                    $image = static::$images_root . "/Asteroid - $planet2.png";
+                    $image = '<img alt="Image:' . $planet2 . '" src="' . 
+                        $this->myUrlEncode($image) . '"/>';
+                        
+                    // Check for default or posted value.
+                    if ( 
+                        $planet2 === @$_SESSION['ribbons'][
+                            $this->spaceToUnderscore("$planet/Asteroid")
+                        ]
+                    ) {
+                        $checked = ' checked="checked"';
+                    } else {
+                        $checked = '';
+                    }
+                    $name = 'Asteroid/Asteroid';
+                    $id = $name . '/' . $this->spaceToUnderscore($planet2);
+                    $return .= '<div class="input_box Asteroid">
+                        <label for="' . $id . '">' . $planet2 . $image . '</label>
+                        <input type="radio" id="' . $id . '" name="' . $name . 
+                        '" value="' . $planet2 . '"' . $checked . '/></div>';
+                }
+            } elseif ($planet === 'Grand Tour') {
                 // Orbits & Landings:
-                foreach( array('Orbits','Landings') as $each ){
-                    $name = 'Grand_Tour/'.$each;
-                    $return .= '
-            <div class="input_box '.$name.'">
-                <label for="'.$name.'">
-                    '.$each.'
-                </label>
-                <select id="'.$name.'" name="'.$name.'">';
-                    $i=0;
-                    while(
+                foreach (array('Orbits', 'Landings') as $each) {
+                    $name = "Grand_Tour/$each";
+                    $return .= '<div class="input_box ' . $name . '">
+                        <label for="' . $name . '">' . $each . '</label>
+                        <select id="' . $name . '" name="' . $name . '">';
+                    $i = 0;
+                    while (
                         $i <= 16
-                        &&(
+                        && (
                             $i <= 14
                             OR $each !== 'Landings'
                         )
-                    ){
+                    ) {
                         $selected = '';
-                        if(
+                        if (
                             $i == @$_SESSION['ribbons'][$name]
-                            ||(
+                            || (
                                 $i == 0
-                                AND empty( $_SESSION['ribbons'][$name] )
+                                AND empty($_SESSION['ribbons'][$name])
                             )
-                        ){
+                        ) {
                             $selected = ' selected="selected"';
                         }
-                        $return .= '
-                    <option value="'.$i.'"'.$selected.'>'.$i.'</option>';
+                        $return .= '<option value="' . $i . '"' . $selected . 
+                            '>' . $i . '</option>';
                         $i++;
                     }
-                    $return .= '
-                </select>
-            </div>';
+                    $return .= '</select></div>';
                 }
             }
-            $return .= '
-            <div style="clear:both;"></div>
-        </div>';
+            $return .= '<div style="clear:both;"></div>
+                </div>';
             
-            
-            foreach( static::$devices as $cat => $types ){
-                $return .= '
-        <div class="category '.$this->spaceToUnderscore($cat).'">';
+            foreach (static::$devices as $cat => $types) {
+                $return .= '<div class="category ' . $this->spaceToUnderscore($cat) . '">';
                 $first_craft = true;
-                foreach( $types as $type => $devices ){
-                    foreach( $devices as $device => $details ){
+                foreach ($types as $type => $devices) {
+                    foreach ($devices as $device => $details) {
                         $desc = $details[1] ? : '';
-                        if(
+                        if (
                             empty($attribs[$type])
                             AND empty($attribs[$device])
                             AND $type !== 'Common'
-                            AND ! (
+                            AND !(
                                 $planet === 'Kerbol'
                                 AND (
                                     $device === 'Kerbol Escape'
                                     || $device === 'Meteor'
                                 )
                             )
-                        ){ continue; }
-                        if(
+                        ) {
+                            // skip this iteration
+                            continue;
+                        }
+                        if (
                             $planet === 'Grand Tour'
-                            AND ! in_array( $device, static::$gt_devices )
-                        ){ continue; }
+                            AND !in_array($device, static::$gt_devices)
+                        ) {
+                            // skip this iteration
+                            continue;
+                        }
                         $input_type = 'checkbox';
-                        $name = $this->spaceToUnderscore($planet.'/'.$device);
+                        $name = $this->spaceToUnderscore("$planet/$device");
                         $id = $name;
                         $value = '';
                         $checked = '';
                         
-                        if( $cat === 'Crafts' ){
-                            $name = $this->spaceToUnderscore($planet.'/craft');
-                            $id = $this->spaceToUnderscore($name.'/'.$device);
-                            $value = ' value="'.$device.'"';
+                        if ($cat === 'Crafts') {
+                            $name = $this->spaceToUnderscore("$planet/craft");
+                            $id = $this->spaceToUnderscore("$name/$device");
+                            $value = ' value="' . $device . '"';
                             $input_type = 'radio';
-                            if( $device === @$_SESSION['ribbons'][$name] ){
+                            if ($device === @$_SESSION['ribbons'][$name]) {
                                 $checked = ' checked="checked"';
                             }
-                            if( $first_craft ){
+                            if ($first_craft) {
                                 $first_craft = false;
-                                if( empty( $_SESSION['ribbons'][$name] ) ){
+                                if (empty($_SESSION['ribbons'][$name])) {
                                     $checked2 = ' checked="checked"';
-                                }else{ $checked2 = ''; }
-                                $return .= '
-            <div class="input_box">
-                <label for="'.$id.'/None">No Craft</label>
-                <input type="'.$input_type.'" id="'.$id.'/None" name="'.$name.'" value="None"'.$checked2.'/>
-            </div>';
+                                } else {
+                                    $checked2 = '';
+                                }
+                                $return .= '<div class="input_box">
+                                    <label for="' . $id . '/None">No Craft</label>
+                                    <input type="' . $input_type . '" id="' . $id . 
+                                    '/None" name="' . $name . '" value="None"' . 
+                                    $checked2 . '/></div>';
                             }
-                        }elseif( ! empty( $_SESSION['ribbons'][$name] ) ){
+                        } elseif (!empty($_SESSION['ribbons'][$name])) {
                             $checked = ' checked="checked"';
                         }
                         
-                        $image = static::$images_root.'/icons/'.$device.'.png';
-                        $image = '
-                    <img alt="'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
-                        $return .= '
-            <div class="input_box">
-                <label for="'.$id.'" title="'.$desc.'">
-                    '.$device.$image.'
-                </label>
-                <input type="'.$input_type.'" id="'.$id.'" name="'.$name.'"'.$value.$checked.'/>
-            </div>';
+                        $image = static::$images_root . "/icons/$device.png";
+                        $image = '<img alt="' . $device . '" src="' . 
+                            $this->myUrlEncode($image) . '"/>';
+                        $return .= '<div class="input_box">
+                            <label for="' . $id . '" title="' . $desc . '">' . 
+                            $device . $image . '</label>
+                            <input type="' . $input_type . '" id="' . $id . 
+                            '" name="' . $name . '"' . $value . $checked . '/></div>';
                     }
                 }
-                $return .= '
-            <div style="clear:both;"></div>
-        </div>';
+                $return .= '<div style="clear:both;"></div></div>';
             }
             
             // Grand Tour specifics:
-            if( $planet === 'Grand Tour' ){
-                $return .= '
-        <div class="category planets">';
-                foreach( static::$planets as $planet2 => $attribs2 ){
-                    if(
+            if ($planet === 'Grand Tour') {
+                $return .= '<div class="category planets">';
+                foreach (static::$planets as $planet2 => $attribs2) {
+                    if (
                         $planet2 === 'Grand Tour'
                         || $planet2 === 'Kerbol'
                         || $planet2 === 'Asteroid'
-                    ){ continue; }
-                    $image = static::$images_root.'/icons/'.$planet2.'.png';
-                    $image = '
-                    <img alt="'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
-                    $name = $this->spaceToUnderscore('Grand Tour/'.$planet2);
-                    if( // Check for default or posted value.
-                        ! empty( $_SESSION['ribbons'][$name] )
-                    ){
+                    ) {
+                        // skip this iteration
+                        continue;
+                    }
+                    $image = static::$images_root . "/icons/$planet2.png";
+                    $image = '<img alt="' . $planet2 . '" src="' . 
+                        $this->myUrlEncode($image) . '"/>';
+                    $name = $this->spaceToUnderscore("Grand Tour/$planet2");
+                    // Check for default or posted value.
+                    if ( 
+                        !empty($_SESSION['ribbons'][$name])
+                    ) {
                         $checked = ' checked="checked"';
-                    }else{ $checked = ''; }
-                    $return .= '
-            <div class="input_box">
-                <label for="'.$name.'">
-                    '.$planet2.$image.'
-                </label>
-                <input type="checkbox" id="'.$name.'" name="'.$name.'"'.$checked.'/>
-            </div>';
+                    } else {
+                        $checked = '';
+                    }
+                    $return .= '<div class="input_box">
+                        <label for="' . $name . '">' . $planet2 . $image . '</label>
+                        <input type="checkbox" id="' . $name . '" name="' . $name . 
+                        '"' . $checked . '/></div>';
                 }
-                $return .= '
-            <div style="clear:both;"></div>
-        </div>';
+                $return .= '<div style="clear:both;"></div></div>';
             }
             
             // END Planet guts.
             
-            $return .= '
-    </div>';
+            $return .= '</div>';
         }
-        $return .= '
-</fieldset></form>
-<div style="clear:both;"></div>';
+        $return .= '</fieldset></form>
+            <div style="clear:both;"></div>';
         return $return;
     }
-    
 }
