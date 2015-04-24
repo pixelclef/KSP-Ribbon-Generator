@@ -898,113 +898,142 @@ class Ribbons {
                         $selected = '';
                     }
                     $image = static::$images_root . "/Asteroid - $planet2.png";
-                    $image = '
-            <img class="device ' . $this->spaceToUnderscore($planet2) . $selected . '" alt="Image:' . $device . '" src="' . $this->myUrlEncode($image) . '"/>';
+                    $image = '<img class="device ' . $this->spaceToUnderscore($planet2) . 
+                        $selected . '" alt="Image:' . $device . '" src="' . 
+                        $this->myUrlEncode($image) . '"/>';
                     $return .= $image;
                 }
             }
             
-            foreach( static::$effects['Textures'] as $effect ){
+            foreach (static::$effects['Textures'] as $effect) {
                 $name = $this->spaceToUnderscore($effect);
-                if( // Check for default or posted value.
-                    (
-                        $effect === @$_SESSION['ribbons']['effects/Texture']
-                        || ! empty( $_SESSION['ribbons']['effects/'.$name] )
-                    )
-                ){
+                // Check for default or posted value.
+                if ( 
+                    $effect === @$_SESSION['ribbons']['effects/Texture']
+                    || ! empty( $_SESSION['ribbons']['effects/'.$name] )
+                ) {
                     $selected = ' selected';
-                }else{ $selected = ''; }
+                } else {
+                    $selected = '';
+                }
                 $image = static::$images_root;
-                if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
-                $image .= '/'.$effect.'.png';
-                $image = '
-        <img class="effect '.$name.$selected.'" alt="Image:'.$effect.'" src="'.$this->myUrlEncode($image).'"/>';
+                if ($planet === 'Grand Tour') {
+                    $image .= '/shield';
+                }
+                $image .= "/$effect.png";
+                $image = '<img class="effect ' . $name . $selected . 
+                    '" alt="Image:' . $effect . '" src="' . 
+                    $this->myUrlEncode($image) . '"/>';
                 $return .= $image;
             }
             
-            foreach( static::$devices_ordered as $device ){
+            foreach (static::$devices_ordered as $device) {
                 // Devices in order of priority.
                 $type = $device[1];
                 $cat = $device[2];
                 $desc = $device[3];
                 $device = $device[0];
-                if(
+                if (
                     $type !== 'Common'
                     AND empty($attribs[$type])
                     AND empty($attribs[$device])
                     AND $planet !== 'Grand Tour'
-                    AND ! (
+                    AND !(
                         $planet === 'Kerbol'
                         AND (
                             $device === 'Kerbol Escape'
                             || $device === 'Meteor'
                         )
                     )
-                ){ continue; }
-                if(
-                    $planet === 'Grand Tour'
-                    AND ! in_array($device,static::$gt_devices)
-                ){
+                ) {
+                    // skip this iteration
                     continue;
                 }
-                if( // Check for default or posted value.
+                if (
+                    $planet === 'Grand Tour'
+                    AND !in_array($device, static::$gt_devices)
+                ) {
+                    // skip this iteration
+                    continue;
+                }
+                
+                // Check for default or posted value.
+                if ( 
                     (
-                        ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/'.$device)] )
-                        || $device === @$_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/craft')]
+                        !empty($_SESSION['ribbons'][$this->spaceToUnderscore("$planet/$device")] )
+                        || $device === @$_SESSION['ribbons'][$this->spaceToUnderscore("$planet/craft")]
                     )
-                    AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
-                ){
+                    AND !empty( $_SESSION['ribbons'][$this->spaceToUnderscore("$planet/Achieved")] )
+                ) {
                     $selected = ' selected';
-                }else{ $selected = ''; }
+                } else {
+                    $selected = '';
+                }
                 $image = static::$images_root;
-                if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
-                $image .= '/'.$device.'.png';
-                $image = '
-            <img class="device '.$this->spaceToUnderscore($device).$selected.'" alt="Image:'.$device.'" src="'.$this->myUrlEncode($image).'"/>';
+                if ($planet === 'Grand Tour') {
+                    $image .= '/shield';
+                }
+                $image .= "/$device.png";
+                $image = '<img class="device ' . $this->spaceToUnderscore($device) . 
+                    $selected . '" alt="Image:' . $device . '" src="' . 
+                    $this->myUrlEncode($image) . '"/>';
                 $return .= $image;
             }
             
-            if( $planet === 'Grand Tour' ){
-                foreach( static::$planets as $planet2 => $attribs2 ){
-                    if(
+            if ($planet === 'Grand Tour') {
+                foreach (static::$planets as $planet2 => $attribs2) {
+                    if (
                         $planet2 === 'Kerbol'
                         || $planet2 === 'Asteroid'
                         || $planet2 === 'Grand Tour'
-                    ){ continue; }
-                    if( // Check for default or posted value.
+                    ) {
+                        // skip this iteration
+                        continue;
+                    }
+                    
+                    // Check for default or posted value.
+                    if ( 
                         ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/'.$planet2)] )
                         AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
-                    ){
+                    ) {
                         $selected = ' selected';
-                    }else{ $selected = ''; }
-                    $image = static::$images_root.'/shield/'.$planet2.' Visit.png';
-                    $image = '
-            <img class="device '.$this->spaceToUnderscore($planet2).$selected.'" alt="Image:'.$planet2.'" src="'.$this->myUrlEncode($image).'"/>';
+                    } else {
+                        $selected = '';
+                    }
+                    $image = static::$images_root . "/shield/$planet2 Visit.png";
+                    $image = '<img class="device ' . $this->spaceToUnderscore($planet2) . 
+                        $selected . '" alt="Image:' . $planet2 . '" src="' . 
+                        $this->myUrlEncode($image) . '"/>';
                     $return .= $image;
                 }
                 
-                $o_l = array('Orbit','Landing');
-                foreach( $o_l as $each ){
-                    $$each = array('count'=>'','silvers'=>array(),'golds'=>array());
+                $o_l = array('Orbit', 'Landing');
+                foreach ($o_l as $each) {
+                    $$each = array(
+                        'count' => '',
+                        'silvers' => array(),
+                        'golds' => array()
+                    );
                     $this_array = &$$each;
-                    $this_array['count'] = 0 + @$_SESSION['ribbons']['Grand_Tour/'.$each.'s'];
-                    if( $this_array['count'] > 0 ){
+                    $this_array['count'] = 0 + @$_SESSION['ribbons']['Grand_Tour/' . $each . 's'];
+                    if ($this_array['count'] > 0 ) {
                         
                         array_push($this_array['golds'], 1);
-                        $count_i = $this_array['count']-1;
+                        $count_i = $this_array['count'] - 1;
                         $silvers = 0;
                         $divisor = 7;
-                        while( $count_i > $divisor ){
+                        while ($count_i > $divisor) {
                             $silvers++;
                             $count_i -= 5;
                             $divisor -= 1;
                         }
                         $golds = $this_array['count'] - ($silvers * 5);
                         
-                        $i=2;while( $i <= 8 ){
-                            if( $i <= $silvers + 1 ){
+                        $i=2;
+                        while ($i <= 8) {
+                            if ($i <= $silvers + 1) {
                                 array_push($this_array['silvers'], $i);
-                            }elseif( $i <= $silvers + $golds ){
+                            } elseif ($i <= $silvers + $golds) {
                                 array_push($this_array['golds'], $i);
                             }
                             $i++;
@@ -1013,24 +1042,36 @@ class Ribbons {
                     }
                 }
                 
-                $i=1;while($i <= 8){
-                    foreach( array('Orbit','Landing') as $each ){
+                $i=1;
+                while ($i <= 8) {
+                    foreach ($o_l as $each) {
                         $this_array = &$$each;
-                        $each_count = 0 + @$_SESSION['ribbons']['Grand_Tour/'.$each];
-                        foreach( array('',' Silver') as $each2 ){
-                            if( $each2 AND $i === 1 ){ continue; }
+                        $each_count = 0 + @$_SESSION['ribbons']["Grand_Tour/$each"];
+                        foreach (array('', ' Silver') as $each2) {
+                            if ($each2 AND $i === 1) {
+                                continue;
+                            }
                             $OLname = $each.' '.$i.$each2;
-                            if( $each2 === '' ){ $each_rl = 'golds'; }
-                            else{ $each_rl = 'silvers'; }
-                            if( // Check for default or posted value.
-                                in_array( $i, $this_array[$each_rl] )
-                                AND ! empty( $_SESSION['ribbons'][$this->spaceToUnderscore($planet.'/Achieved')] )
-                            ){
+                            if ($each2 === '') {
+                                $each_rl = 'golds';
+                            } else {
+                                $each_rl = 'silvers';
+                            }
+                            
+                            // Check for default or posted value.
+                            if ( 
+                                in_array($i, $this_array[$each_rl])
+                                AND !empty($_SESSION['ribbons'][$this->spaceToUnderscore("$planet/Achieved")] )
+                            ) {
                                 $selected = ' selected';
-                            }else{ $selected = ''; }
-                            $image = static::$images_root.'/shield/'.$OLname.'.png';
-                            $image = '
-            <img class="device '.$this->spaceToUnderscore($OLname).$selected.'" alt="Image:'.$OLname.'" src="'.$this->myUrlEncode($image).'"/>';
+                            } else {
+                                $selected = '';
+                            }
+                            $image = static::$images_root . "/shield/$OLname.png";
+                            $image = '<img class="device ' . 
+                                $this->spaceToUnderscore($OLname) . $selected . 
+                                '" alt="Image:' . $OLname . '" src="' . 
+                                $this->myUrlEncode($image) . '"/>';
                             $return .= $image;
                         }
                     }
@@ -1038,38 +1079,38 @@ class Ribbons {
                 }
             }
             
-            foreach( static::$effects['Bevels'] as $effect ){
+            foreach (static::$effects['Bevels'] as $effect) {
                 $name = $this->spaceToUnderscore($effect);
-                if( // Check for default or posted value.
-                    (
-                        $effect === @$_SESSION['ribbons']['effects/Texture']
-                        || ! empty( $_SESSION['ribbons']['effects/'.$name] )
-                    )
-                ){
+                // Check for default or posted value.
+                if( 
+                    $effect === @$_SESSION['ribbons']['effects/Texture']
+                    || ! empty( $_SESSION['ribbons']["effects/$name"] )
+                ) {
                     $selected = ' selected';
-                }else{ $selected = ''; }
+                } else {
+                    $selected = '';
+                }
                 $image = static::$images_root;
-                if( $planet === 'Grand Tour' ){ $image .= '/shield'; }
-                $image .= '/'.$effect.'.png';
-                $image = '
-        <img class="effect '.$name.$selected.'" alt="Image:'.$effect.'" src="'.$this->myUrlEncode($image).'"/>';
+                if ($planet === 'Grand Tour') {
+                    $image .= '/shield';
+                }
+                $image .= "/$effect.png";
+                $image = '<img class="effect ' . $name . $selected . 
+                    '" alt="Image:' . $effect . '" src="' . 
+                    $this->myUrlEncode($image) . '"/>';
                 $return .= $image;
             }
             
             // END Ribbon guts.
             
-            $return .= '
-        </div>';
-            if( $ri === count(static::$planets) ){
-                $return .= '
-    </div>';
+            $return .= '</div>';
+            if ($ri === count(static::$planets)) {
+                $return .= '</div>';
             }
         }
-        $return .= '
-    <div style="clear:both;"></div>
-</div>
-<div style="clear:both;"></div>
-';
+        $return .= '<div style="clear:both;"></div>
+            </div>
+            <div style="clear:both;"></div>';
         return $return;
     }
     
